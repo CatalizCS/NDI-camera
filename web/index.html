@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>TamaNDI Remote</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="shell">
+    <header><strong>TamaNDI</strong><span id="status">OFFLINE</span></header>
+    <section class="hero"><div id="streamState">Ready</div><div id="sourceName">—</div></section>
+    <section class="grid">
+      <button data-action="stream.start">Start Stream</button>
+      <button data-action="stream.stop">Stop Stream</button>
+      <label>Camera <select id="camera"></select></label>
+      <label>Resolution <select id="resolution"></select></label>
+      <label>FPS <select id="fps"></select></label>
+      <label>Bitrate <input id="bitrate" type="number" min="1" step="1" value="25"> Mbps</label>
+      <button id="torch">Torch</button>
+      <button id="stabilize">Stabilization</button>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

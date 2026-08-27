@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TamaNDISettings",
+  "type": "object",
+  "properties": {
+    "sourceName": {"type":"string"},
+    "resolution": {"type":"string"},
+    "fps": {"type":"number"},
+    "bitrateMbps": {"type":"number", "minimum": 0},
+    "cameraMode": {"enum":["single","dualIndependent","dualComposite","tripleIndependent","tripleComposite"]},
+    "stabilization": {"type":"string"},
+    "torchEnabled": {"type":"boolean"},
+    "orientation": {"enum":["auto","portrait","landscapeLeft","landscapeRight"]},
+    "orientationLocked": {"type":"boolean"},
+    "audioMuted": {"type":"boolean"}
+  },
+  "additionalProperties": false
+}
