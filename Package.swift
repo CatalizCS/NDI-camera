@@ -9,6 +9,7 @@ let package = Package(
         .library(name: "Camera", targets: ["Camera"]),
         .library(name: "MultiCam", targets: ["MultiCam"]),
         .library(name: "NDI", targets: ["NDI"]),
+        .library(name: "Audio", targets: ["Audio"]),
     ],
     targets: [
         .target(
@@ -34,6 +35,12 @@ let package = Package(
             path: "Sources/NDI",
             swiftSettings: [.swiftLanguageMode(.v6)]
         ),
+        .target(
+            name: "Audio",
+            dependencies: ["Domain"],
+            path: "Sources/Audio",
+            swiftSettings: [.swiftLanguageMode(.v6)]
+        ),
         .testTarget(
             name: "DomainTests",
             dependencies: ["Domain"],
@@ -56,6 +63,12 @@ let package = Package(
             name: "NDITests",
             dependencies: ["NDI", "Camera", "Domain"],
             path: "Tests/NDITests",
+            swiftSettings: [.swiftLanguageMode(.v6)]
+        ),
+        .testTarget(
+            name: "AudioTests",
+            dependencies: ["Audio", "Domain"],
+            path: "Tests/AudioTests",
             swiftSettings: [.swiftLanguageMode(.v6)]
         ),
     ]
