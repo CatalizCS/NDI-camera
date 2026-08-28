@@ -8,6 +8,7 @@ let package = Package(
         .library(name: "Domain", targets: ["Domain"]),
         .library(name: "Camera", targets: ["Camera"]),
         .library(name: "MultiCam", targets: ["MultiCam"]),
+        .library(name: "NDI", targets: ["NDI"]),
     ],
     targets: [
         .target(
@@ -27,6 +28,12 @@ let package = Package(
             path: "Sources/MultiCam",
             swiftSettings: [.swiftLanguageMode(.v6)]
         ),
+        .target(
+            name: "NDI",
+            dependencies: ["Domain", "Camera"],
+            path: "Sources/NDI",
+            swiftSettings: [.swiftLanguageMode(.v6)]
+        ),
         .testTarget(
             name: "DomainTests",
             dependencies: ["Domain"],
@@ -43,6 +50,12 @@ let package = Package(
             name: "MultiCamTests",
             dependencies: ["MultiCam", "Camera", "Domain"],
             path: "Tests/MultiCamTests",
+            swiftSettings: [.swiftLanguageMode(.v6)]
+        ),
+        .testTarget(
+            name: "NDITests",
+            dependencies: ["NDI", "Camera", "Domain"],
+            path: "Tests/NDITests",
             swiftSettings: [.swiftLanguageMode(.v6)]
         ),
     ]
