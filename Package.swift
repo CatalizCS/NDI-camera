@@ -13,6 +13,7 @@ let package = Package(
         .library(name: "Remote", targets: ["Remote"]),
         .library(name: "Persistence", targets: ["Persistence"]),
         .library(name: "Diagnostics", targets: ["Diagnostics"]),
+        .library(name: "UI", targets: ["UI"]),
     ],
     targets: [
         .target(
@@ -62,6 +63,20 @@ let package = Package(
             path: "Sources/Diagnostics",
             swiftSettings: [.swiftLanguageMode(.v6)]
         ),
+        .target(
+            name: "UI",
+            dependencies: [
+                "Domain",
+                "Camera",
+                "Audio",
+                "NDI",
+                "Remote",
+                "Persistence",
+                "Diagnostics"
+            ],
+            path: "Sources/UI",
+            swiftSettings: [.swiftLanguageMode(.v6)]
+        ),
         .testTarget(
             name: "DomainTests",
             dependencies: ["Domain"],
@@ -108,6 +123,12 @@ let package = Package(
             name: "DiagnosticsTests",
             dependencies: ["Diagnostics", "Domain"],
             path: "Tests/DiagnosticsTests",
+            swiftSettings: [.swiftLanguageMode(.v6)]
+        ),
+        .testTarget(
+            name: "UITests",
+            dependencies: ["UI", "Domain"],
+            path: "Tests/UITests",
             swiftSettings: [.swiftLanguageMode(.v6)]
         ),
     ]
