@@ -1,0 +1,89 @@
+name: TamaNDI
+options:
+  bundleIdPrefix: com.tamandicam
+  deploymentTarget:
+    iOS: "18.0"
+  xcodeVersion: "16.0"
+  createIntermediateGroups: true
+
+settings:
+  SWIFT_VERSION: "6.0"
+  SWIFT_STRICT_CONCURRENCY: complete
+  ENABLE_USER_SCRIPT_SANDBOXING: NO
+  TARGETED_DEVICE_FAMILY: "1,2" # iPhone and iPad
+
+targets:
+  TamaNDI:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources/App
+        createIntermediateGroups: true
+      - path: Sources/Domain
+      - path: Sources/Camera
+      - path: Sources/MultiCam
+      - path: Sources/NDI
+      - path: Sources/Audio
+      - path: Sources/Remote
+      - path: Sources/Persistence
+      - path: Sources/Diagnostics
+      - path: Sources/UI
+      - path: web
+        buildPhase: resources
+    info:
+      path: Sources/App/Info.plist
+      properties:
+        CFBundleDisplayName: "TamaNDI"
+        CFBundleShortVersionString: "1.0.0"
+        CFBundleVersion: "1"
+        UILaunchScreen: {}
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.tamandicam.app
+        INFOPLIST_FILE: Sources/App/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: "" # Set your Apple Developer Team ID here
+        CODE_SIGN_IDENTITY: "Apple Development"
+    dependencies:
+      - sdk: AVFoundation.framework
+      - sdk: CoreMedia.framework
+      - sdk: CoreVideo.framework
+      - sdk: AudioToolbox.framework
+      - sdk: Network.framework
+
+  TamaNDITests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests/DomainTests
+      - path: Tests/CameraTests
+      - path: Tests/MultiCamTests
+      - path: Tests/NDITests
+      - path: Tests/AudioTests
+      - path: Tests/RemoteTests
+      - path: Tests/PersistenceTests
+      - path: Tests/DiagnosticsTests
+      - path: Tests/UITests
+    dependencies:
+      - target: TamaNDI
+
+schemes:
+  TamaNDI:
+    build:
+      targets:
+        TamaNDI: all
+        TamaNDITests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - TamaNDITests
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release

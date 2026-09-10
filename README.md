@@ -29,5 +29,19 @@ The repository intentionally does NOT contain NDI SDK binaries or proprietary he
 4. Run `prompts/13_INTEGRATION_AND_QA.md` last.
 5. Add the real NDI SDK locally; never fake NDI APIs.
 
+## Building the IPA Package
+See [docs/BUILDING_IPA.md](docs/BUILDING_IPA.md) for full instructions.
+
+To build `TamaNDI.ipa` on a Mac:
+```bash
+# Automated build script
+./scripts/build_ipa.sh
+```
+Or open in Xcode via XcodeGen:
+```bash
+xcodegen generate
+open TamaNDI.xcodeproj
+```
+
 ## Asset policy
 The included assets are intentionally original/simple SVG assets for the app UI. They are not NDI trademarks and do not include proprietary logos.
