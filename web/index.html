@@ -1,26 +1,250 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>TamaNDI Remote</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TamaNDI — Remote Controller</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="shell">
-    <header><strong>TamaNDI</strong><span id="status">OFFLINE</span></header>
-    <section class="hero"><div id="streamState">Ready</div><div id="sourceName">—</div></section>
-    <section class="grid">
-      <button data-action="stream.start">Start Stream</button>
-      <button data-action="stream.stop">Stop Stream</button>
-      <label>Camera <select id="camera"></select></label>
-      <label>Resolution <select id="resolution"></select></label>
-      <label>FPS <select id="fps"></select></label>
-      <label>Bitrate <input id="bitrate" type="number" min="1" step="1" value="25"> Mbps</label>
-      <button id="torch">Torch</button>
-      <button id="stabilize">Stabilization</button>
+    <header class="header">
+        <div class="header-brand">
+            <h1>TamaNDI</h1>
+            <span class="connection-status" id="connectionStatus">Disconnected</span>
+        </div>
+        <nav class="header-nav">
+            <button class="nav-btn active" data-panel="overview">Overview</button>
+            <button class="nav-btn" data-panel="camera">Camera</button>
+            <button class="nav-btn" data-panel="video">Video</button>
+            <button class="nav-btn" data-panel="audio">Audio</button>
+            <button class="nav-btn" data-panel="ndi">NDI</button>
+            <button class="nav-btn" data-panel="orientation">Orient</button>
+            <button class="nav-btn" data-panel="presets">Presets</button>
+            <button class="nav-btn" data-panel="diagnostics">Diag</button>
+        </nav>
+    </header>
+
+    <!-- Pairing Modal -->
+    <div class="modal" id="pairingModal">
+        <div class="modal-content">
+            <h2>Pair with TamaNDI</h2>
+            <p>Enter the 6-digit code shown on your iPhone</p>
+            <input type="text" id="pairingCode" maxlength="6" pattern="[0-9]*" inputmode="numeric" placeholder="000000" autocomplete="off">
+            <button class="btn btn-primary" id="pairBtn">Pair</button>
+            <p class="error-text" id="pairingError"></p>
+        </div>
+    </div>
+
+    <!-- Overview Panel -->
+    <section class="panel active" id="panel-overview">
+        <div class="overview-grid">
+            <div class="stat-card">
+                <div class="stat-label">Stream Status</div>
+                <div class="stat-value" id="streamStatus">Idle</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Source Name</div>
+                <div class="stat-value" id="sourceName">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Camera / Lens</div>
+                <div class="stat-value" id="currentLens">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Resolution / FPS</div>
+                <div class="stat-value" id="resFPS">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Measured FPS</div>
+                <div class="stat-value" id="measuredFPS">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Bitrate</div>
+                <div class="stat-value" id="bitrate">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Dropped Frames</div>
+                <div class="stat-value" id="droppedFrames">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Audio Route</div>
+                <div class="stat-value" id="audioRoute">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Torch</div>
+                <div class="stat-value" id="torchStatus">Off</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Stabilization</div>
+                <div class="stat-value" id="stabMode">—</div>
+            </div>
+            <div class="stat-card warn">
+                <div class="stat-label">Thermal</div>
+                <div class="stat-value" id="thermalState">Nominal</div>
+            </div>
+        </div>
+        <div class="overview-actions">
+            <button class="btn btn-stream" id="streamToggle">Start Stream</button>
+        </div>
     </section>
-  </main>
-  <script src="app.js"></script>
+
+    <!-- Camera Panel -->
+    <section class="panel" id="panel-camera">
+        <h2>Camera</h2>
+        <div class="control-group">
+            <label>Lens</label>
+            <div class="btn-group" id="lensSelector"></div>
+        </div>
+        <div class="control-group">
+            <label>Zoom</label>
+            <input type="range" id="zoomSlider" min="1" max="10" step="0.1" value="1">
+            <span id="zoomValue">1.0x</span>
+        </div>
+        <div class="control-group">
+            <label>Focus</label>
+            <select id="focusMode">
+                <option value="continuousAutoFocus">Auto</option>
+                <option value="autoFocus">One-Shot</option>
+                <option value="locked">Locked</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label>Exposure</label>
+            <select id="exposureMode">
+                <option value="continuousAutoExposure">Auto</option>
+                <option value="locked">Locked</option>
+                <option value="custom">Custom</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label>Exposure Compensation</label>
+            <input type="range" id="evSlider" min="-3" max="3" step="0.1" value="0">
+            <span id="evValue">0 EV</span>
+        </div>
+    </section>
+
+    <!-- Video Panel -->
+    <section class="panel" id="panel-video">
+        <h2>Video</h2>
+        <div class="control-group">
+            <label>Resolution</label>
+            <select id="resolutionSelect">
+                <option value="3840x2160">4K (3840×2160)</option>
+                <option value="1920x1080" selected>1080p (1920×1080)</option>
+                <option value="1280x720">720p (1280×720)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label>Frame Rate</label>
+            <select id="fpsSelect">
+                <option value="30">30 fps</option>
+                <option value="60" selected>60 fps</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label>Stabilization</label>
+            <select id="stabSelect">
+                <option value="off">Off</option>
+                <option value="standard">Standard</option>
+                <option value="cinematic">Cinematic</option>
+                <option value="cinematicExtended">Cinematic Extended</option>
+            </select>
+        </div>
+    </section>
+
+    <!-- Audio Panel -->
+    <section class="panel" id="panel-audio">
+        <h2>Audio</h2>
+        <div class="control-group">
+            <label>Input Device</label>
+            <select id="audioDeviceSelect"></select>
+        </div>
+        <div class="control-group">
+            <label>Mute</label>
+            <button class="btn btn-toggle" id="muteToggle">Unmuted</button>
+        </div>
+        <div class="control-group">
+            <label>Gain</label>
+            <input type="range" id="gainSlider" min="0" max="2" step="0.01" value="1">
+            <span id="gainValue">1.0</span>
+        </div>
+        <div class="control-group">
+            <label>Audio Level</label>
+            <div class="level-meter">
+                <div class="level-bar" id="audioLevelBar"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NDI Panel -->
+    <section class="panel" id="panel-ndi">
+        <h2>NDI</h2>
+        <div class="control-group">
+            <label>Source Name</label>
+            <input type="text" id="ndiSourceName" placeholder="TamaNDI">
+        </div>
+        <div class="control-group">
+            <label>Group</label>
+            <input type="text" id="ndiGroup" placeholder="(default)">
+        </div>
+        <div class="ndi-stats">
+            <div class="stat-row"><span>Frames Sent:</span><span id="ndiFramesSent">0</span></div>
+            <div class="stat-row"><span>Frames Dropped:</span><span id="ndiFramesDropped">0</span></div>
+            <div class="stat-row"><span>Queue Depth:</span><span id="ndiQueueDepth">0</span></div>
+        </div>
+    </section>
+
+    <!-- Orientation Panel -->
+    <section class="panel" id="panel-orientation">
+        <h2>Orientation &amp; Display</h2>
+        <div class="control-group">
+            <label>Orientation</label>
+            <div class="btn-group">
+                <button class="btn btn-option" data-orientation="auto">Auto</button>
+                <button class="btn btn-option" data-orientation="portrait">Portrait</button>
+                <button class="btn btn-option" data-orientation="landscapeLeft">Land. Left</button>
+                <button class="btn btn-option" data-orientation="landscapeRight">Land. Right</button>
+            </div>
+        </div>
+        <div class="control-group">
+            <label>Orientation Lock</label>
+            <button class="btn btn-toggle" id="orientLockToggle">Unlocked</button>
+        </div>
+        <div class="control-group">
+            <label>Display Mode</label>
+            <div class="btn-group">
+                <button class="btn btn-option" data-display="normal">Normal</button>
+                <button class="btn btn-option" data-display="dimmed">Dimmed</button>
+                <button class="btn btn-option" data-display="blacked">Blacked</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Presets Panel -->
+    <section class="panel" id="panel-presets">
+        <h2>Presets</h2>
+        <div class="preset-grid" id="presetGrid"></div>
+    </section>
+
+    <!-- Diagnostics Panel -->
+    <section class="panel" id="panel-diagnostics">
+        <h2>Diagnostics</h2>
+        <div class="diagnostics-grid">
+            <div class="stat-row"><span>Capture FPS:</span><span id="diagCaptureFPS">—</span></div>
+            <div class="stat-row"><span>Output FPS:</span><span id="diagOutputFPS">—</span></div>
+            <div class="stat-row"><span>Dropped Frames:</span><span id="diagDropped">—</span></div>
+            <div class="stat-row"><span>Video Queue:</span><span id="diagVideoQueue">—</span></div>
+            <div class="stat-row"><span>Audio Queue:</span><span id="diagAudioQueue">—</span></div>
+            <div class="stat-row"><span>Bitrate:</span><span id="diagBitrate">—</span></div>
+            <div class="stat-row"><span>Memory:</span><span id="diagMemory">—</span></div>
+            <div class="stat-row"><span>Thermal:</span><span id="diagThermal">—</span></div>
+            <div class="stat-row"><span>Format:</span><span id="diagFormat">—</span></div>
+            <div class="stat-row"><span>Audio Route:</span><span id="diagAudioRoute">—</span></div>
+            <div class="stat-row"><span>Network:</span><span id="diagNetwork">—</span></div>
+        </div>
+        <button class="btn" id="exportDiagBtn">Export JSON</button>
+    </section>
+
+    <script src="app.js"></script>
 </body>
 </html>
