@@ -2,6 +2,7 @@
 // UI — Wires all engine modules together and manages app lifecycle.
 
 import SwiftUI
+import UIKit
 import Domain
 import Camera
 import Audio

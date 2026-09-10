@@ -2,6 +2,7 @@
 // UI — UIKit representable wrapping AVCaptureVideoPreviewLayer for zero-copy camera preview.
 
 import SwiftUI
+import UIKit
 import AVFoundation
 import Camera
 import Domain
