@@ -495,4 +495,11 @@ public actor CameraEngine: CameraControlling, CameraCapabilityProviding {
             sessionState: .running
         )}
     }
+
+    // MARK: - Preview Support
+
+    /// Returns the underlying capture session for preview rendering.
+    public func getCaptureSession() -> AVCaptureSession {
+        session
+    }
 }
