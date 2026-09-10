@@ -17,7 +17,21 @@ To build an `.ipa` file for iOS:
 
 ---
 
-## 2. Option A: Automated Build Script (Fastest)
+## 2. Option A: Build in the Cloud with GitHub Actions (No Mac Needed!)
+
+If you do not have a Mac or want the fastest, zero-setup way to get the `.ipa`:
+
+1. Open this repository on **GitHub** in your web browser.
+2. Click the **Actions** tab at the top.
+3. In the left sidebar, click **Build iOS IPA**.
+4. Click the **Run workflow** dropdown on the right, select branch `feat/phase-6-9-remote-persistence-diagnostics` (or `main`), and click **Run workflow**.
+5. GitHub Actions will launch a macOS 15 Sequoia virtual machine, compile all modules, and package `TamaNDI.ipa`.
+6. When the workflow completes (green checkmark), click into the run.
+7. Scroll down to the **Artifacts** section at the bottom and click **TamaNDI-iOS-App** to download the zipped `.ipa` directly to your computer!
+
+---
+
+## 3. Option B: Automated Local Build Script (Mac)
 
 We have provided an automated script that handles project generation, archiving, and export:
 

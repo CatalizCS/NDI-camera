@@ -1,0 +1,102 @@
+name: Build iOS IPA
+
+on:
+  push:
+    branches:
+      - main
+      - 'feat/**'
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      configuration:
+        description: 'Build Configuration'
+        required: true
+        default: 'Release'
+        type: choice
+        options:
+          - Release
+          - Debug
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build-ipa:
+    name: Build & Package IPA
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Select Xcode 16
+        run: |
+          sudo xcode-select -s /Applications/Xcode_16.0.app/Contents/Developer || sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+          xcodebuild -version
+          swift --version
+
+      - name: Install XcodeGen
+        run: |
+          if ! command -v xcodegen &> /dev/null; then
+            brew install xcodegen
+          fi
+          xcodegen --version
+
+      - name: Generate Xcode Project
+        run: |
+          xcodegen generate
+          ls -la TamaNDI.xcodeproj
+
+      - name: Build Archive
+        env:
+          CONFIG: ${{ github.event.inputs.configuration || 'Release' }}
+        run: |
+          mkdir -p build
+          xcodebuild archive \
+            -project TamaNDI.xcodeproj \
+            -scheme TamaNDI \
+            -configuration "${CONFIG}" \
+            -destination 'generic/platform=iOS' \
+            -archivePath "build/TamaNDI.xcarchive" \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            COMPILER_INDEX_STORE_ENABLE=NO
+
+      - name: Package IPA
+        run: |
+          mkdir -p build/Payload
+          cp -r build/TamaNDI.xcarchive/Products/Applications/TamaNDI.app build/Payload/
+          
+          # Ad-hoc codesign the app bundle
+          codesign --force --deep --sign - build/Payload/TamaNDI.app
+          
+          cd build
+          zip -r TamaNDI.ipa Payload
+          cd ..
+          
+          ls -lh build/TamaNDI.ipa
+          echo "IPA Size: $(du -h build/TamaNDI.ipa | cut -f1)"
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TamaNDI-iOS-App
+          path: build/TamaNDI.ipa
+          retention-days: 14
+
+      - name: Attach IPA to Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/TamaNDI.ipa
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
