@@ -10,6 +10,9 @@ let package = Package(
         .library(name: "MultiCam", targets: ["MultiCam"]),
         .library(name: "NDI", targets: ["NDI"]),
         .library(name: "Audio", targets: ["Audio"]),
+        .library(name: "Remote", targets: ["Remote"]),
+        .library(name: "Persistence", targets: ["Persistence"]),
+        .library(name: "Diagnostics", targets: ["Diagnostics"]),
     ],
     targets: [
         .target(
@@ -39,6 +42,24 @@ let package = Package(
             name: "Audio",
             dependencies: ["Domain"],
             path: "Sources/Audio",
+            swiftSettings: [.swiftLanguageMode(.v6)]
+        ),
+        .target(
+            name: "Remote",
+            dependencies: ["Domain"],
+            path: "Sources/Remote",
+            swiftSettings: [.swiftLanguageMode(.v6)]
+        ),
+        .target(
+            name: "Persistence",
+            dependencies: ["Domain"],
+            path: "Sources/Persistence",
+            swiftSettings: [.swiftLanguageMode(.v6)]
+        ),
+        .target(
+            name: "Diagnostics",
+            dependencies: ["Domain"],
+            path: "Sources/Diagnostics",
             swiftSettings: [.swiftLanguageMode(.v6)]
         ),
         .testTarget(
@@ -71,6 +92,23 @@ let package = Package(
             path: "Tests/AudioTests",
             swiftSettings: [.swiftLanguageMode(.v6)]
         ),
+        .testTarget(
+            name: "RemoteTests",
+            dependencies: ["Remote", "Domain"],
+            path: "Tests/RemoteTests",
+            swiftSettings: [.swiftLanguageMode(.v6)]
+        ),
+        .testTarget(
+            name: "PersistenceTests",
+            dependencies: ["Persistence", "Domain"],
+            path: "Tests/PersistenceTests",
+            swiftSettings: [.swiftLanguageMode(.v6)]
+        ),
+        .testTarget(
+            name: "DiagnosticsTests",
+            dependencies: ["Diagnostics", "Domain"],
+            path: "Tests/DiagnosticsTests",
+            swiftSettings: [.swiftLanguageMode(.v6)]
+        ),
     ]
 )
-
